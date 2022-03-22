@@ -6,18 +6,25 @@ register_matplotlib_converters()
 
 # Import data (Make sure to parse dates. Consider setting index column to 'date'.)
 df = pd.read_csv('fcc-forum-pageviews.csv')
-df = pd.to_datetime(df['date'], format="%y-%m")
-df.set_index('date')
+df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
+df['date'] = df['date'].dt.strftime('%Y-%m')
 df.rename(columns={'date': 'Date', 'value': 'Page Views'}, inplace=True)
+df.set_index('Date', inplace=True)
 
 # Clean data
 df = df[df.isnull() == False]
-print(df)
+df = df.loc[
+    (df['Page Views'] >= df['Page Views'].quantile(0.025)) |
+    (df['Page Views'] <= df['Page Views'].quantile(0.025))
+]
 
 
 def draw_line_plot():
+    print(df)
     # Draw line plot
-    fig = sns.lineplot(x="date", y="Page Views", data=df).figure
+    fig = sns.lineplot(data=df, ci=None)
+    fig.get_legend().remove()
+    fig = fig.figure
 
     # Save image and return fig (don't change this part)
     fig.savefig('line_plot.png')
