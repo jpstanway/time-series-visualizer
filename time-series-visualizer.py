@@ -1,3 +1,4 @@
+import calendar
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -14,33 +15,38 @@ df.set_index('Date', inplace=True)
 # Clean data
 df = df[df.isnull() == False]
 df = df.loc[
-    (df['Page Views'] >= df['Page Views'].quantile(0.025)) |
-    (df['Page Views'] <= df['Page Views'].quantile(0.025))
+  (df['Page Views'] >= df['Page Views'].quantile(0.025)) |
+  (df['Page Views'] <= df['Page Views'].quantile(0.025))
 ]
 
-
 def draw_line_plot():
-    print(df)
     # Draw line plot
+    fig = plt.figure(figsize=(12,3))
     fig = sns.lineplot(data=df, ci=None)
     fig.get_legend().remove()
     fig = fig.figure
-
+  
     # Save image and return fig (don't change this part)
     fig.savefig('line_plot.png')
     return fig
 
-
 def draw_bar_plot():
     # Copy and modify data for monthly bar plot
-    df_bar = None
-
+    df_bar = df.copy()
+    df_bar['Months'] = pd.to_datetime(df_bar.index, format='%Y-%m')
+    df_bar['Years'] = df_bar['Months'].dt.strftime('%Y')
+    df_bar['Months'] = df_bar['Months'].dt.month_name()
+    df_bar.set_index('Years', inplace=True)
+    
     # Draw bar plot
+
+
+
+
 
     # Save image and return fig (don't change this part)
     fig.savefig('bar_plot.png')
     return fig
-
 
 def draw_box_plot():
     # Prepare data for box plots (this part is done!)
@@ -50,6 +56,10 @@ def draw_box_plot():
     df_box['month'] = [d.strftime('%b') for d in df_box.date]
 
     # Draw box plots (using Seaborn)
+
+
+
+
 
     # Save image and return fig (don't change this part)
     fig.savefig('box_plot.png')
